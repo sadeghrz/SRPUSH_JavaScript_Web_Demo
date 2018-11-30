@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="Content-Security-Policy"  content="connect-src * 'unsafe-inline';">
+        <script src="startupScript.js"></script>
+        <script>
+            
+            setTimeout(() => {
+                const wsHost = 'ws://192.168.1.100:9780';
+                const session = 'wss-6fab087aa3cd7c95520fb70f469c1c';
+                if (navigator && navigator.serviceWorker && navigator.serviceWorker.controller) {
+                    navigator.serviceWorker.controller.postMessage('connect/*/' + wsHost + '/*/' + session)
+                } else {
+                    alert("برای دریافت پیام ها لطفا صفحه را دوباره بارگذاری کنید");
+                }
+
+            }, 2000);
+
+            function disconnect() {
+                navigator.serviceWorker.controller.postMessage('disconnect')
+            }
+
+            navigator.serviceWorker.addEventListener('message', (event) => {
+                console.log('message event in mainPage: ' + event.data);
+                document.getElementById('incomingMsgOutput').value += event.data + '\n';
+            });
+
+        </script>
+        <style>
+            table    { border: 2px solid black; }
+            textarea { width: 513px; border: 2px solid black; }
+        </style>
+    </head>
+    <body>
+        <h1>WebSocket Client</h1>
+        <table>
+            <tr>
+                <td></td>
+                <td><a href="page2.html">gopage 2</a></td>
+            </tr>
+        </table><br/>
+        <textarea id="incomingMsgOutput" rows="10" cols="20" disabled="disabled"></textarea>
+    </body>
+</html>
