@@ -143,7 +143,7 @@ connectWS = () => {
     }
     
     let webSocketURL = null;
-    queryString = serializeQS({ session: SESSION });
+    queryString = serializeQS({ session: SESSION, Platform: 'JSWeb' });
 
     webSocketURL = HOST + '/' + queryString;
     console.log('connectWS::Connecting to: ' + webSocketURL);
