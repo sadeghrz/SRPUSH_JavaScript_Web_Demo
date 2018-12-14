@@ -4,8 +4,8 @@
         <meta charset="UTF-8">
         <meta http-equiv="Content-Security-Policy"  content="connect-src * 'unsafe-inline';">
         <script>
-            navigator.serviceWorker.addEventListener('message', (event) => {
-                console.log('message event in page 2: ' + event.data);
+            navigator.serviceWorker.addEventListener('message', (data) => {
+                console.log('message event in page 2: ' + data);
             });
         </script>
     </head>

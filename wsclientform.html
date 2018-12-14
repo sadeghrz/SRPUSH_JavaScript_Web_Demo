@@ -4,27 +4,38 @@
         <meta charset="UTF-8">
         <meta http-equiv="Content-Security-Policy"  content="connect-src * 'unsafe-inline';">
         <script src="startupScript.js"></script>
+        <script src="webSocketConnection.js"></script>
         <script>
-            
-            setTimeout(() => {
+
+            document.addEventListener('DOMContentLoaded', () => { 
+
+                // onMessage for both off-page and on-page push messages
+                function onMessage(data) {
+                    if (typeof data === 'object') {
+                        data = JSON.stringify(data);
+                    }
+                    console.log('message event in mainPage: ' + data);
+                    document.getElementById('incomingMsgOutput').value += data + '\n';
+                };
+
+                // connect information
                 const wsHost = 'ws://192.168.1.100:9780';
-                const session = 'wss-6fab087aa3cd7c95520fb70f469c1c';
-                if (navigator && navigator.serviceWorker && navigator.serviceWorker.controller) {
-                    navigator.serviceWorker.controller.postMessage('connect/*/' + wsHost + '/*/' + session)
-                } else {
-                    alert("برای دریافت پیام ها لطفا صفحه را دوباره بارگذاری کنید");
-                }
+                const session = 'wss-3bffd7335373fca3d742c87b6a4dcb';
+                const WP_Key = 'BIf8f2SOxjwHAY_YCCno3uxHAJW1g25PBKv0dNoo_FJoeKhNN5leK7w6vsBPTLjVjl5XEfp8epD8lK5fO2S5wOg';
 
-            }, 2000);
+                // register SW and subscribe for off-page push
+                navigator.serviceWorker.addEventListener('message', (e) => onMessage(e.data));
 
-            function disconnect() {
-                navigator.serviceWorker.controller.postMessage('disconnect')
-            }
+                // subscribe for off-page push
+                window.vapidPublicKey = base64UrlToUint8Array(WP_Key);
+                registerAndSubscribeForPush((subscription) => {
+                    const subscriptionInfo = JSON.stringify({ ...subscription.toJSON() });
+                    console.log(subscriptionInfo);
 
-            navigator.serviceWorker.addEventListener('message', (event) => {
-                console.log('message event in mainPage: ' + event.data);
-                document.getElementById('incomingMsgOutput').value += event.data + '\n';
-            });
+                    // connect webSocket and wait for in-page push
+                    startWS(wsHost, session, subscriptionInfo, onMessage);
+                });
+            }, false);
 
         </script>
         <style>
